@@ -1,39 +1,21 @@
 import {Router} from 'express';
+import multer from 'multer';
 
-import { getRepository } from 'typeorm';
-import Orphanage from './models/Orphanage';
+import uploadConfig from './config/upload';
+import OrphanagesController from './controllers/OrphanagesController';
 
 const routes = Router();
+const upload = multer(uploadConfig);
 
-routes.post('/orphanages', async (request, response) => {
-    // console.log(request.query);  // /users
-    // console.log(request.params); // '/users/:id'
-    // console.log(request.body);
-    const {
-        name,
-        latitude,
-        longitude,
-        about,
-        instructions,
-        opening_hours,
-        open_on_weekends
-    } = request.body
+// Model Views Controllers - MVC
 
-    const orphanagesRepository = getRepository(Orphanage);
+routes.get('/orphanages', OrphanagesController.index);
+routes.get('/orphanages/:id', OrphanagesController.show);
+routes.post('/orphanages', upload.array('images'), OrphanagesController.create);
 
-    const orphanage = orphanagesRepository.create({
-        name,
-        latitude,
-        longitude,
-        about,
-        instructions,
-        opening_hours,
-        open_on_weekends   
-    });
 
-    await orphanagesRepository.save(orphanage);
-
-    return response.status(201).json({ orphanage })
-});
-
+// console.log(request.query);  -> /users
+// console.log(request.params); -> '/users/:id'
+// console.log(request.body);
+    
 export default routes;
